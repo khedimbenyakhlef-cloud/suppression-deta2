@@ -1,0 +1,26 @@
+{
+  "name": "suppression-deta",
+  "version": "1.0.0",
+  "description": "Suppression Déta — Jeu Action/Thriller professionnel",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "build": "echo 'Build complet'",
+    "test": "node server/test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.3.1",
+    "express-rate-limit": "^7.1.5",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Khedim Benyakhlef",
+  "license": "MIT"
+}

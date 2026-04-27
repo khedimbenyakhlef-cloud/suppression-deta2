@@ -1,0 +1,19 @@
+{
+  "name": "Suppression Déta",
+  "short_name": "SD",
+  "description": "Jeu Action/Thriller — Sauvez Nova Déta du chaos",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "theme_color": "#080c14",
+  "background_color": "#080c14",
+  "lang": "fr",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "/assets/images/favicon.ico", "sizes": "32x32",   "type": "image/x-icon" },
+    { "src": "/assets/images/favicon.svg", "sizes": "any",     "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "/assets/images/hero-bg.jpg", "sizes": "1920x1080", "type": "image/jpeg", "label": "Nova Déta — Vue principale" }
+  ]
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <rect width="400" height="120" rx="12" fill="none"/>
+  <text x="20" y="38" font-family="Arial,sans-serif" font-weight="900" font-size="13" fill="#c9943a" letter-spacing="4">UN SCENARIO POUR FILM</text>
+  <text x="16" y="90" font-family="Arial,sans-serif" font-weight="900" font-size="56" fill="#f0f6ff" letter-spacing="3">SUPPRESSION</text>
+  <text x="16" y="118" font-family="Arial,sans-serif" font-weight="900" font-size="40" fill="#e8304a" letter-spacing="8">DÉTA</text>
+  <rect x="16" y="98" width="380" height="2" fill="#1e3050"/>
+</svg>

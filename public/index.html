@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080c14">
+<meta name="description" content="Suppression Déta — Jeu Action/Thriller par Khedim Benyakhlef">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Suppression Déta">
+<meta property="og:title" content="Suppression Déta">
+<meta property="og:description" content="Action / Thriller — Sauvez Nova Déta du chaos">
+<meta property="og:image" content="/assets/images/hero-bg.jpg">
+<title>Suppression Déta</title>
+
+<!-- Favicon (logo taskbar/onglet) -->
+<link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+<link rel="icon" type="image/x-icon"  href="/assets/images/favicon.ico">
+<link rel="apple-touch-icon"          href="/assets/images/favicon.ico">
+
+<!-- PWA Manifest (logo dans la barre des tâches) -->
+<link rel="manifest" href="/manifest.json">
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Overlay scanlines cinématique -->
+<div class="scanlines" aria-hidden="true"></div>
+
+<!-- Loading Screen -->
+<div id="loading-screen" role="status" aria-label="Chargement du jeu">
+  <img src="/assets/images/logo_large.svg" alt="Suppression Déta" style="width:280px;opacity:.9;">
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text" id="load-text">Initialisation...</div>
+</div>
+
+<!-- HEADER global -->
+<header id="header" style="display:none;" role="banner">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="/assets/images/favicon.svg" alt="Logo" width="28" height="28">
+    <span class="header-logo">SUPPRESSION <span>DÉTA</span></span>
+  </div>
+  <nav class="header-nav" role="navigation">
+    <span class="header-player" id="header-player-name"></span>
+    <button class="btn btn-outline btn-sm" onclick="showScreen('screen-menu')" id="btn-menu-nav">Menu</button>
+    <button class="btn btn-outline btn-sm" onclick="showScreen('screen-leaderboard')">Scores</button>
+    <button class="btn btn-outline btn-sm" onclick="toggleSound()" id="btn-sound">🔊</button>
+  </nav>
+</header>
+
+<!-- Notifications -->
+<div id="notification" role="alert" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ÉCRAN MENU PRINCIPAL
+══════════════════════════════════════════════════════════ -->
+<main id="screen-menu" class="screen active" role="main">
+  <div id="screen-splash" class="screen active" style="min-height:calc(100vh - 0px)">
+    <div style="position:absolute;inset:0;background:url('/assets/images/hero-bg.jpg') center/cover no-repeat;opacity:0.18;pointer-events:none;" aria-hidden="true"></div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:0;width:100%;padding:40px 24px;">
+      <img src="/assets/images/logo_large.svg" alt="Suppression Déta — Logo" style="width:min(480px,90vw);margin-bottom:8px;" class="anim-fadeup">
+      <p class="splash-tagline" style="animation-delay:.1s">Action / Thriller · Nova Déta · Khedim Benyakhlef</p>
+      <div class="splash-divider"></div>
+      <p class="splash-desc anim-fadeup" style="animation-delay:.2s">
+        Une capitale futuriste. Un groupe de mercenaires. Un gaz qui fait rire toute la ville.
+        Choisissez votre camp — et sauvez Nova Déta.
+      </p>
+
+      <!-- Formulaire joueur -->
+      <div id="player-form" style="width:100%;max-width:360px;margin-bottom:28px;" class="anim-fadeup">
+        <label class="label" for="player-name-input">Votre nom de Gardien</label>
+        <div style="display:flex;gap:8px;">
+          <input class="input" id="player-name-input" type="text" maxlength="20" placeholder="Entrez votre nom..." autocomplete="off" spellcheck="false">
+          <button class="btn btn-primary" onclick="registerPlayer()" id="btn-register">OK</button>
+        </div>
+      </div>
+
+      <div class="splash-buttons anim-fadeup" style="animation-delay:.3s">
+        <button class="btn btn-accent btn-lg" id="btn-play" onclick="startGame()" disabled>
+          ▶ JOUER
+        </button>
+        <button class="btn btn-outline btn-lg" onclick="showScreen('screen-story')">HISTOIRE</button>
+        <button class="btn btn-gold btn-lg" onclick="showScreen('screen-leaderboard')">SCORES</button>
+      </div>
+
+      <div class="splash-badges anim-fadeup" style="animation-delay:.45s">
+        <span class="badge badge-red">Action</span>
+        <span class="badge badge-cyan">Thriller</span>
+        <span class="badge badge-gold">Nova Déta</span>
+        <span class="badge badge-blue">WebGL</span>
+        <span class="badge badge-green">Multi-plateforme</span>
+      </div>
+
+      <!-- Stats serveur live -->
+      <div id="live-stats" style="margin-top:36px;display:flex;gap:20px;flex-wrap:wrap;justify-content:center;font-size:.82rem;color:var(--c-muted);">
+        <span>👾 <span id="stat-players">—</span> joueurs</span>
+        <span>🏆 <span id="stat-top">—</span> top score</span>
+        <span>🎮 <span id="stat-games">—</span> parties</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     ÉCRAN HISTOIRE
+══════════════════════════════════════════════════════════ -->
+<div id="screen-story" class="screen" style="flex-direction:column;padding:60px 0 80px;">
+  <div class="container-sm">
+    <button class="btn btn-outline btn-sm" onclick="showScreen('screen-menu')" style="margin-bottom:32px;">← Retour</button>
+    <div class="badge badge-red" style="margin-bottom:12px;">ACTION / THRILLER</div>
+    <h1 style="font-size:2.5rem;margin-bottom:8px;">Suppression Déta</h1>
+    <p style="color:var(--c-muted);margin-bottom:32px;font-size:.9rem;">Scénario original — Khedim Benyakhlef · Maison d'Édition Ahlem</p>
+
+    <div style="display:flex;flex-direction:column;gap:24px;">
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span class="badge badge-red">ACTE I</span>
+          <span style="color:var(--c-white);font-weight:600;">Le Contrat</span>
+        </div>
+        <p class="card-body">Dans une capitale futuriste en plein essor, un groupe de mercenaires redoutables est recruté par un commanditaire mystérieux. Leur mission : remplacer le gaz extincteur de Nova Déta par le <strong style="color:var(--c-accent);">Gaz Inferno</strong>, hautement inflammable.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span class="badge badge-cyan">ACTE II</span>
+          <span style="color:var(--c-white);font-weight:600;">Le Chaos du Gaz Rire</span>
+        </div>
+        <p class="card-body">Des chimistes paranoïaques sabotent le plan en remplaçant le Gaz Inferno par le <strong style="color:var(--c-cyan);">Gaz Rire</strong> — inoffensif mais hilarant. Nova Déta sombre dans un chaos absurde. Les citoyens rient de manière incontrôlable.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span class="badge badge-gold">ACTE III</span>
+          <span style="color:var(--c-white);font-weight:600;">L'Adversaire Masqué</span>
+        </div>
+        <p class="card-body">L'adversaire masqué se révèle être <strong style="color:var(--c-gold);">Liam</strong> — un ancien ami trahi. Alex doit choisir : rédemption ou destruction. Quatre fins possibles selon vos décisions.</p>
+      </div>
+
+      <div class="card card-dark" style="border:1px solid var(--c-gold)">
+        <div class="card-title" style="color:var(--c-gold);">🎭 Personnages</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img src="/assets/images/alex.png" alt="Alex" width="36" height="72" style="image-rendering:pixelated;">
+            <div><div style="color:var(--c-white);font-weight:600;font-size:.9rem;">Alex</div><div style="font-size:.78rem;color:var(--c-muted);">Mercenaire / Combat</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img src="/assets/images/lana.png" alt="Lana" width="36" height="72" style="image-rendering:pixelated;">
+            <div><div style="color:var(--c-white);font-weight:600;font-size:.9rem;">Lana</div><div style="font-size:.78rem;color:var(--c-muted);">Hackeuse / Tech</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;margin-top:40px;">
+      <button class="btn btn-accent btn-lg" onclick="startGame()">▶ JOUER MAINTENANT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ÉCRAN JEU
+══════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud" role="complementary" aria-label="Interface de jeu">
+      <div id="hud-top">
+        <!-- Santé -->
+        <div class="hud-panel" id="hud-health">
+          <div class="hud-label">Santé · <span id="char-name">Alex</span></div>
+          <div class="hud-value" id="hud-hp">100</div>
+          <div class="hud-bar"><div class="hud-fill" id="hp-fill" style="width:100%"></div></div>
+        </div>
+        <!-- Score + Niveau -->
+        <div class="hud-panel" id="hud-score">
+          <div class="hud-label">Score · Acte <span id="hud-act">1</span></div>
+          <div class="hud-value accent-gold" id="hud-score-val">0</div>
+          <div style="font-size:.72rem;color:var(--c-muted);margin-top:4px;">Kills: <span id="hud-kills">0</span> · Gaz: <span id="hud-gas-type" style="color:var(--c-cyan);">Aucun</span></div>
+        </div>
+        <!-- Énergie -->
+        <div class="hud-panel" id="hud-energy">
+          <div class="hud-label">Énergie Hack</div>
+          <div class="hud-value accent-cyan" id="hud-en">100</div>
+          <div class="hud-bar"><div class="hud-fill" id="en-fill" style="width:100%;background:var(--c-cyan)"></div></div>
+        </div>
+        <!-- Minimap -->
+        <div class="hud-panel" style="padding:6px;">
+          <canvas id="minimap-canvas" width="100" height="100" style="border-radius:50%;display:block;" aria-label="Minimap"></canvas>
+        </div>
+      </div>
+
+      <!-- Réputation (bas gauche) -->
+      <div id="hud-rep" style="position:absolute;bottom:60px;left:12px;display:flex;flex-direction:column;gap:4px;">
+        <div class="hud-panel" style="padding:8px 12px;min-width:0;">
+          <div class="hud-label" style="margin-bottom:4px;">Réputation</div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:.72rem;">
+            <div style="display:flex;justify-content:space-between;gap:8px;"><span style="color:var(--c-muted);">Citoyens</span><span id="rep-citizens" style="color:var(--c-green);">50</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;"><span style="color:var(--c-muted);">Police</span><span id="rep-law" style="color:var(--c-cyan);">50</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;"><span style="color:var(--c-muted);">Mercenaires</span><span id="rep-merc" style="color:var(--c-gold);">50</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;"><span style="color:var(--c-muted);">Déta</span><span id="rep-deta" style="color:var(--c-accent);">50</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contrôles clavier (desktop) -->
+      <div id="hud-bottom" role="list" aria-label="Contrôles">
+        <div class="hud-key" role="listitem"><kbd>WASD</kbd> Déplacer</div>
+        <div class="hud-key" role="listitem"><kbd>Clic</kbd> Attaquer</div>
+        <div class="hud-key" role="listitem"><kbd>E</kbd> Spécial</div>
+        <div class="hud-key" role="listitem"><kbd>F</kbd> Interagir</div>
+        <div class="hud-key" role="listitem"><kbd>Tab</kbd> Switch</div>
+        <div class="hud-key" role="listitem"><kbd>ESC</kbd> Pause</div>
+      </div>
+
+      <!-- Message contextuel -->
+      <div id="hud-message" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none;background:rgba(8,12,20,.92);border:1px solid var(--c-border);border-radius:10px;padding:16px 24px;text-align:center;font-size:1.1rem;color:var(--c-white);pointer-events:none;"></div>
+    </div>
+
+    <!-- Contrôles mobile -->
+    <div id="mobile-controls" aria-label="Contrôles tactiles">
+      <div id="joystick-zone" class="joystick-zone" aria-label="Joystick de déplacement">
+        <div id="joystick-thumb" class="joystick-thumb"></div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn-action attack"  id="btn-attack"  aria-label="Attaquer">ATK</button>
+        <button class="btn-action special" id="btn-special" aria-label="Capacité spéciale">SPE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre pause -->
+  <div style="display:flex;justify-content:center;gap:8px;padding:8px;background:rgba(8,12,20,.9);border-top:1px solid var(--c-border);">
+    <button class="btn btn-outline btn-sm" onclick="togglePause()">⏸ Pause</button>
+    <button class="btn btn-outline btn-sm" onclick="switchCharacter()">🔄 Switch personnage</button>
+    <button class="btn btn-outline btn-sm" onclick="deployGas('rire')">💨 Gaz Rire</button>
+    <button class="btn btn-outline btn-sm" onclick="endGame()">🚪 Quitter</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ÉCRAN RÉSULTAT
+══════════════════════════════════════════════════════════ -->
+<div id="screen-result" class="screen">
+  <div id="result-ending-badge" class="badge badge-gold" style="font-size:.9rem;padding:6px 18px;"></div>
+  <h1 id="result-ending-title" style="font-size:2.2rem;"></h1>
+  <p id="result-ending-desc" style="max-width:500px;color:var(--c-muted);text-align:center;line-height:1.8;"></p>
+
+  <div class="result-score" id="result-score-val">0</div>
+  <div class="result-rank" id="result-rank-val"></div>
+
+  <div class="stats-grid" id="result-stats"></div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+    <button class="btn btn-accent btn-lg" onclick="startGame()">▶ REJOUER</button>
+    <button class="btn btn-gold btn-lg"   onclick="showScreen('screen-leaderboard')">🏆 SCORES</button>
+    <button class="btn btn-outline"       onclick="showScreen('screen-menu')">Menu principal</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ÉCRAN LEADERBOARD
+══════════════════════════════════════════════════════════ -->
+<div id="screen-leaderboard" class="screen" style="flex-direction:column;padding:60px 0 80px;">
+  <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
+      <div>
+        <h1 style="font-size:2rem;">🏆 Classement</h1>
+        <p style="color:var(--c-muted);margin-top:4px;">Meilleurs gardiens de Nova Déta</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="showScreen('screen-menu')">← Retour</button>
+    </div>
+
+    <!-- Top 3 podium -->
+    <div class="grid-3" id="podium" style="margin-bottom:32px;"></div>
+
+    <!-- Table complète -->
+    <div class="card card-dark" style="overflow-x:auto;">
+      <table class="leaderboard-table" id="lb-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Gardien</th><th>Score</th><th>Kills</th><th>Fin</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body">
+          <tr><td colspan="6" style="text-align:center;color:var(--c-muted);padding:24px;">Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-outline btn-sm" id="btn-load-more" onclick="loadMoreScores()">Charger plus</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL PAUSE
+══════════════════════════════════════════════════════════ -->
+<div id="modal-pause" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+  <div class="modal">
+    <div class="modal-title" id="pause-title">⏸ Pause</div>
+    <div class="modal-body">
+      Prêt à continuer votre mission, Gardien ?
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" onclick="togglePause()">▶ Continuer</button>
+      <button class="btn btn-outline" onclick="switchCharacter()">🔄 Changer de personnage</button>
+      <button class="btn btn-outline" onclick="showScreen('screen-story')">📖 Histoire</button>
+      <button class="btn btn-accent"  onclick="endGame()">🚪 Quitter la mission</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL DIALOGUE
+══════════════════════════════════════════════════════════ -->
+<div id="modal-dialogue" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dialogue-speaker">
+  <div class="modal" style="max-width:560px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <img id="dialogue-portrait" src="/assets/images/alex.png" alt="" width="48" height="96" style="image-rendering:pixelated;">
+      <div>
+        <div class="badge badge-red" id="dialogue-speaker" style="margin-bottom:6px;"></div>
+        <div id="dialogue-text" style="font-size:1rem;color:var(--c-text);line-height:1.7;"></div>
+      </div>
+    </div>
+    <div id="dialogue-choices" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
+<script src="/js/engine.js"></script>
+<script src="/js/game.js"></script>
+<script src="/js/ui.js"></script>
+</body>
+</html>
